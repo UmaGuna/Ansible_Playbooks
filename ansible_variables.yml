@@ -1,0 +1,25 @@
+# command to findout os name and version from ansible_facts 
+#ansible -m setup -a "filter=*distribution*" -i newinventory all
+
+#command to findout os family from ansible_facts 
+#ansible -m setup -a "filter=*os*" -i newinventory all
+---
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: update and install httpd/apache2
+      package:
+        name: "{{ package_name }}"
+        state: present
+        update_cache: yes
+      notify: 
+        - restart and enable apache
+      when: ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Debian'
+
+  handlers:  
+   - name: restart and enable apache
+     service:
+        name: "{{ package_name }}"
+        enabled: yes
+        state: restarted
+     when: ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Debian'

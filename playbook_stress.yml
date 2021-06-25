@@ -1,0 +1,17 @@
+- hosts: all
+  become: yes
+  tasts:
+    - name: install stress
+      apt:
+       name: stress
+       state: present
+
+ #adhoc command to install stree
+ # ansible -i testinventory -m apt -a "name=stress state=present" -b all      
+
+  # adhoc command to uninstall stree
+ # ansible -i testinventory -m apt -a "name=stress state=absent" -b all 
+
+
+#linux command
+#sudo apt-get install stress -y 

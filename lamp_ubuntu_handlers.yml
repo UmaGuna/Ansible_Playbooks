@@ -1,0 +1,100 @@
+# Install apache and php on ubuntu 
+# sudo apt-get update
+# sudo apt-get install apache2
+# sudo systemctl restart apache2
+# sudo apt-get install php libapache2-mod-php php-mysql php-cli
+# sudo vi /var/www/html/info.php
+# <?php
+# phpinfo();
+# ?>
+# sudo systemctl restart apache2
+
+#initial playbook 
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: update and install apache
+      apt:
+       name: apache2
+       state: present
+       update_cache: yes
+    - name: restart apache server
+      service:
+        name: apache2
+        enabled: yes
+        state: restarted 
+    - name: install php
+      apt:
+       name: php
+       state: present
+       update_cache: yes  
+    - name: install libapache2-mod-php
+      apt: 
+        name: libapache2-mod-php
+        state: present
+        update_cache: yes
+    - name: install php-mysql
+      apt:
+        name: php-mysql
+        state: present
+        update_cache: yes
+    - name: install php-cli
+      apt:
+        name: php-cli
+        state: present
+        update_cache: yes    
+    - name: restart apache server
+      service:
+        name: apache2
+        enabled: yes 
+        state: restarted    
+
+ # optimized the above playbook by adding handlers
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: update and install apache
+      apt:
+       name: apache2
+       state: present
+       update_cache: yes
+      nofify: 
+        name:  restart apache server
+    - name: install php
+      apt:
+       name: php
+       state: present
+       update_cache: yes  
+    - name: install libapache2-mod-php
+      apt: 
+        name: libapache2-mod-php
+        state: present
+        update_cache: yes
+    - name: install php-mysql
+      apt:
+        name: php-mysql
+        state: present
+        update_cache: yes
+    - name: install php-cli
+      apt:
+        name: php-cli
+        state: present
+        update_cache: yes
+      nofify: 
+        name:  restart apache servery       
+  handlers:    
+    - name: restart apache server
+      service:
+        name: apache2
+        enabled: yes 
+        state: restarted    
+
+
+
+        
+
+
+
+

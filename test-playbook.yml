@@ -1,0 +1,8 @@
+- hosts: all
+  become: yes
+  tasks:
+    -name: update ubuntu package and intsall tee
+      apt:
+        name: tree
+        update-cache: yes
+        state: present

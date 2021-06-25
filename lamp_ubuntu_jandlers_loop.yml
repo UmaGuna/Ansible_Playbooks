@@ -1,0 +1,31 @@
+
+# multiple apt can be replased by loop
+
+- hosts: all
+  become: yes
+  tasks:
+    - name: update and install apache
+      apt:
+       name: apache2
+       state: present
+       update_cache: yes
+      nofify: 
+        - restart apache server
+    - name: install php,libapache2-mod-php, php-mysql, php-cli
+      apt:
+       name: {{ item }}
+       state: present
+       update_cache: yes
+       loop:
+        - php
+        - libapache2-mod-php
+        - php-mysql
+        - php-cli
+      nofify: 
+        - restart apache server      
+  handlers:    
+    - name: restart apache server
+      service:
+        name: apache2
+        enabled: yes
+        state: restarted     

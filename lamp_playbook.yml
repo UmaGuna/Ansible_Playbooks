@@ -1,0 +1,67 @@
+# command to findout os name and version from ansible_facts 
+#ansible -m setup -a "filter=*distribution*" -i newinventory all
+
+#command to findout os family from ansible_facts 
+#ansible -m setup -a "filter=*os*" -i newinventory all
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: update and install httpd
+      yum:
+        name: httpd
+        state: present
+        update_cache: yes
+      notify: 
+        - restart httpd server
+      when:
+       ansible_facts['os_family'] == 'RedHat'
+    - name: install php modules
+      yum:
+        name: "{{ item }}"
+        state: present
+      loop:
+         - php
+         - php-mysql
+      notify: 
+        - restart httpd server
+      when:
+       ansible_facts['os_family'] == 'RedHat'
+    - name: update and install apache
+      apt:
+       name: apache2
+       state: present
+       update_cache: yes
+      notify: 
+        - Restart apache service
+      when:
+       ansible_facts['os_family'] == 'Debian'
+    - name: install php
+      apt:
+       name: "{{ item }}"
+       state: present
+       update_cache: yes
+      loop:
+        - php
+        - libapache2-mod-php
+        - php-mysql
+        - php-cli
+      notify: 
+        - Restart apache service
+      when:
+       ansible_facts['os_family'] == 'Debian'
+  handlers:  
+    - name: Restart apache service
+      service:
+        name: apache2
+        enabled: yes
+        state: restarted
+      when:
+       ansible_facts['os_family'] == 'Debian'
+    - name: restart httpd server
+      service:
+        name: httpd
+        enabled: yes
+        state: restarted
+      when:
+       ansible_facts['os_family'] == 'RedHat'

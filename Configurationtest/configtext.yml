@@ -1,0 +1,12 @@
+
+---
+- hosts: all
+  #become: yes
+  tasks:
+    - name: copy a dynaminc file
+      template:
+        src: Readme.txt.j2
+        dest: "{{ansible_user_dir}}/Readme.txt" 
+    - name: "test the dynamic value" 
+      debug:
+        var: ansible_facts['os_family'] 

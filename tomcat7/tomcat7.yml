@@ -1,0 +1,40 @@
+
+---
+- hosts: all
+  become: yes
+  vars:
+    max_memmory: 512m
+    max_perm_size: 256m
+    tomcat_user: admin
+    tomcat_password: password
+  tasks:
+    - name: Run on debian os 'os_family'
+      fail:
+        msg: "This package is run only in Debian"
+      when: ansible_facts['os_family'] != 'Debian' 
+    - name : install tomcat7
+      package:
+       name: tomcat7
+       update_cache: yes
+       state: present
+    - name: update configuration
+      template: 
+        src: tomcat7.j2
+        dest: /etc/default/tomcat7   
+      notify:
+        - Restart tomcat
+    - name: update configuration
+      template: 
+        src: tomcat-users.xml.j2
+        dest: /etc/tomcat7/tomcat-users.xml   
+      notify:
+        - Restart tomcat    
+  handlers:
+    - name: Restart tomcat
+      service:
+        name: tomcat7
+        enabled: yes
+        state: restarted
+      when: ansible_facts['os_family'] == 'Debian'  
+
+

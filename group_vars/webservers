@@ -1,0 +1,8 @@
+
+package_name: apache2
+php_module_list:
+  - php
+  - php-cli
+  - php-mysql
+
+ ansible_port : 2222 

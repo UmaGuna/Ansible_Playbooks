@@ -1,0 +1,57 @@
+
+
+# To debug ansible command
+#  ansible-playbook -v -i hosts.yml ansible_list_variable.yml
+
+# for more debug info
+#  ansible-playbook -vv -i hosts.yml ansible_list_variable.yml
+
+# for more debug info
+#  ansible-playbook -vvv -i hosts.yml ansible_list_variable.yml
+
+#-v, --verbose         verbose mode (-vvv for more, -vvvv to enable connection debugging)
+
+#inventory file is hosts.yml
+
+# adding debug in the yml file 
+
+---
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Fail the playbook which is not supported
+      fail:
+        msg: "This playbook will executed only for Redhat and Debain variants"
+      when: ansible_facts['os_family'] != 'RedHat' and ansible_facts['os_family'] != 'Debian'
+    - name: update and install httpd/apache2
+      package:
+        name: "{{ package_name }}"
+        state: present
+        update_cache: yes
+      notify: 
+        - restart and enable apache
+    - name: printing package name
+      debug:
+        var: package_name
+    - name: printing php modules list name
+      debug:
+        var: php_module_list
+    - name: install php modules
+      package:
+       name: "{{ item }}"
+       state: present
+       update_cache: yes
+      loop: "{{ php_module_list }}"
+    #- name: download php info
+    #  get_url:
+    #    url: https://qt-s3-new-testing.s3-us-west-2.amazonaws.com/info.php
+    #    dest: /var/www/html/info.php
+      notify: 
+        - restart and enable apache
+  handlers:  
+   - name: restart and enable apache
+     service:
+        name: "{{ package_name }}"
+        enabled: yes
+        state: restarted
+     when: ansible_facts['os_family'] == 'RedHat' or ansible_facts['os_family'] == 'Debian'

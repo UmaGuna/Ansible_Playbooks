@@ -1,0 +1,27 @@
+---
+- hosts: all
+  tasks:
+    - name: ping the machine
+      ping:
+---
+- hosts: all
+  tasks:
+   - name : install  tree
+     apt:
+      name: tree
+      state: present      
+
+#FAILED! => {"changed": false, "msg": "Failed to lock apt for exclusive operation"} while yaml file execuation
+#because security issue the problem will solve if you gave sudo persmissions like become: yes
+
+
+#devops@ip-172-31-47-60:~/testplaybooks$ vi tree-playbook.yml 
+
+- hosts: all
+  become: yes
+  tasks:
+         - name: update ubuntu package and install tree
+           apt:
+            name: tree
+            update_cache: yes
+            state: present

@@ -1,0 +1,26 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: update and install httpd
+      yum:
+       name: httpd
+       state: present
+       update_cache: yes
+      nofify: 
+        name:  restart httpd server
+    - name: install php
+      yum:
+       name: {{ item }}
+       state: present
+       update_cache: yes 
+       loop:
+        - php
+        - php-mysql 
+      nofify: 
+        name:  restart httpd server  
+  handlers:    
+    - name: restart httpd server
+      service:
+        name: httpd
+        enabled: yes
+        state: restarted    
